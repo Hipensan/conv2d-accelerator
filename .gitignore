@@ -1,2 +1,4 @@
 /py/yolov3-tiny_numpy_weights
 /py/yolov3-tiny_weights_with_connections.json
+/py/layer*
+/C/header
