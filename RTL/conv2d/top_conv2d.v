@@ -11,10 +11,10 @@ module top_conv2d#
 		output reg			o_ctrl_we,
 		output reg	[31:0] 	o_ctrl_data, 			// for end signal
 
-		output 		[27:0] 	o_img_addr,
-		input 		[31:0] 	i_img_data,
+		output 		[17:0] 	o_img_addr, 			// 2^18 > 416*416
+		input 		[31:0] 	i_img_data, 
 
-		output reg 	[27:0] 	o_outimg_addr,
+		output reg 	[17:0] 	o_outimg_addr,
 		output 				o_outimg_we,
 		output 		[31:0] 	o_outimg_data
 	);
@@ -53,6 +53,7 @@ reg [27:0] c_img_addr, n_img_addr;
 reg [3:0] r_cnt;
 reg conv2d_start;
 
+reg [27:0] 	c_outimg_addr, n_outimg_addr;
 
 
 //===============================================================
@@ -101,6 +102,7 @@ always@(posedge i_clk, negedge i_rst)
 
 		c_ctrl_addr 	<= 0;
 		c_img_addr 		<= 0;
+		c_outimg_addr 	<= 0;
 	end else begin
 		c_kernel 		<= n_kernel;
 		c_state 		<= n_state;
@@ -116,6 +118,7 @@ always@(posedge i_clk, negedge i_rst)
 
 		c_ctrl_addr 	<= n_ctrl_addr;
 		c_img_addr 		<= n_img_addr;
+		c_outimg_addr 	<= n_outimg_addr;
 	end
 
 
@@ -139,6 +142,7 @@ always@* begin
 	o_ctrl_we 		= 0;
 
 	n_img_addr 		= c_img_addr;
+	n_outimg_addr 	= c_outimg_addr;
 	conv2d_start 	= 0;
 
 	case(c_state)
@@ -160,6 +164,14 @@ always@* begin
 
 		CONV2D: begin
 			n_img_addr = c_img_addr + 1;
+
+			if(conv2d_o_valid) begin
+				n_outimg_addr = c_outimg_addr + 1;
+			end
+
+
+
+
 			if(conv2d_o_done) begin
 				n_state = IDLE;
 				// done flag to ctrl memory
@@ -168,6 +180,7 @@ always@* begin
 
 				// init img_addr
 				n_img_addr = 0;
+				n_outimg_addr = 0;
 			end
 		end
 
