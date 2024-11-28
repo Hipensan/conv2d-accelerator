@@ -30,8 +30,6 @@ module conv2d_universal
 		input 						i_stride, 		// not using, 1 fixed
 		input 				[9:0] 	i_max_ci,
 		input 				[9:0] 	i_max_co,
-		input 				[9:0] 	i_ci,
-		input 				[9:0]  	i_co,
 		input wire signed 	[15:0] 	i_data,
 		input wire 	 	 	[143:0] i_kernel_w,
 		output reg					o_done,
@@ -49,7 +47,7 @@ parameter 	DATA_WIDTH = 16;
 parameter 	MAX_BUF_SIZE = 841;
 
 localparam 	IDLE 	= 0,
-			WORK1 	= 1;
+			WORK 	= 1;
 
 
 
@@ -125,13 +123,13 @@ always@* begin
 			n_x = 0;
 			n_y = 0;
 			for(i=0; i<MAX_BUF_SIZE; i=i+1) 	n_line_buf[i] = 0;
-			if(i_start) n_state = WORK1;
+			if(i_start) n_state = WORK;
 		end
 
 
 
 
-		WORK1: begin
+		WORK: begin
 			// image pos
 			if(c_x < i_max_width-1)	 		n_x = c_x + 1;
 			else begin

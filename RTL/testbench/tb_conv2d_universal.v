@@ -60,8 +60,8 @@ initial begin
     // Initialize Inputs
     i_rst = 0;
     i_start = 0;
-    i_max_width = 9'd6;  // Example width
-    i_max_height = 9'd6; // Example height
+    i_max_width = 9'd4;  // Example width
+    i_max_height = 9'd4; // Example height
     i_kernel_size = 2'd3; // 3x3 kernel or 1x1
     i_is_pad = 1;         // Padding enabled
     i_stride = 1;         // Stride 1
@@ -95,8 +95,8 @@ initial begin
 
 
 
-    for(i=0; i<6; i=i+1) begin
-        for(j=0; j<6; j=j+1) begin
+    for(i=0; i<4; i=i+1) begin
+        for(j=0; j<4; j=j+1) begin
             @(posedge i_clk) i_data = ifmap[i][j];
         end
     end
