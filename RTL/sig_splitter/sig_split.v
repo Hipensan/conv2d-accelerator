@@ -4,6 +4,6 @@ module sig_split(
 	);
 
 
-assign o_sig = {4{i_sig}};
+assign o_sig = {i_sig, i_sig, i_sig, i_sig};
 
 endmodule

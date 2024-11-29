@@ -14,13 +14,13 @@ module tb_top_conv2d;
     wire o_ctrl_we;
     wire [31:0] o_ctrl_data;
 
-    wire [27:0] o_img_addr;
+    wire [17:0] o_img_addr;
     reg [31:0] i_img_data;
 
-    wire [27:0] o_addr;
+    wire [17:0] o_addr;
     wire o_we;
     wire [31:0] o_data;
-
+reg zero_flag;
     // DUT (Device Under Test) Instantiation
     top_conv2d #(
         .DATA_WIDTH(DATA_WIDTH)
@@ -50,13 +50,15 @@ module tb_top_conv2d;
         i_rst = 0;
         i_ctrl_data = 0;
         i_img_data = 0;
-
+        zero_flag = 0;
         // Reset Sequence
         #10 i_rst = 1; // Deassert reset
         #10;
-
+        wait(dut.o_ctrl_we);
+        zero_flag = 1;
         // Wait for Computation Completion
-        wait(dut.o_ctrl_data[1]); // Wait until computation is done
+        wait(dut.conv2d_inst_.o_done); // Wait until computation is done
+        
         $display("Computation Done!");
 
         // Finish Simulation
@@ -66,7 +68,7 @@ module tb_top_conv2d;
 
     always@(posedge i_clk) begin        // ctrl memory structure
         case(o_ctrl_addr)
-            0:  i_ctrl_data <= {23'b0, 4'b0, 1'b0, 1'b0, 1'b1, 1'b0, 1'b1};       // {cur_layer(4), maxpool(1), Bn&ReLU(1), Conv(1), done(1), start(1)}
+            0:  i_ctrl_data <= zero_flag ? 0 : {23'b0, 4'b0, 1'b0, 1'b0, 1'b1, 1'b0, 1'b1};       // {cur_layer(4), maxpool(1), Bn&ReLU(1), Conv(1), done(1), start(1)}
             1:  i_ctrl_data <= 0;       //  X            
             2:  i_ctrl_data <= {11'b0, 2'd1, 1'b1, 2'd3, 8'd6, 8'd6};       // {stride(2), padding(1), kernel(2), height(8), width(8)}            
             3:  i_ctrl_data <= {12'b0, 10'd16, 10'd3};       // {out-channel(10), in-channel(10)}            

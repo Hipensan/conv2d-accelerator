@@ -14,7 +14,7 @@ module top_conv2d#
 		output 		[17:0] 	o_img_addr, 			// 2^18 > 416*416
 		input 		[31:0] 	i_img_data, 
 
-		output reg 	[17:0] 	o_outimg_addr,
+		output  	[17:0] 	o_outimg_addr,
 		output 				o_outimg_we,
 		output 		[31:0] 	o_outimg_data
 	);
@@ -31,8 +31,8 @@ localparam 	CTRL 	= 4'd0,
 wire fKernel;
 reg [DATA_WIDTH*9-1:0] 	c_kernel, 		n_kernel;
 reg [0:0]				c_state, 		n_state;
-reg [8:0]				c_width, 		n_width;
-reg [8:0]				c_height, 		n_height;
+reg [7:0]				c_width, 		n_width;
+reg [7:0]				c_height, 		n_height;
 reg [1:0]				c_kernel_sz, 	n_kernel_sz;
 reg  					c_padding, 		n_padding;
 reg [1:0]				c_stride, 		n_stride;
@@ -49,13 +49,12 @@ wire 					conv2d_o_valid;
 
 
 reg [3:0] c_ctrl_addr, n_ctrl_addr;
-reg [27:0] c_img_addr, n_img_addr; 			
-reg [3:0] r_cnt;
+reg [17:0] c_img_addr, n_img_addr; 			
 reg conv2d_start;
 
-reg [27:0] 	c_outimg_addr, n_outimg_addr;
+reg [17:0] 	c_outimg_addr, n_outimg_addr;
 
-
+// reg [15:0] r_tmp;
 //===============================================================
 // Nets
 assign fKernel 	=  (c_ctrl_addr >= 4) && (c_ctrl_addr < 13); //4~12, exclude 13(1101), 14(1110), 15(1111)
@@ -63,8 +62,12 @@ assign fKernel 	=  (c_ctrl_addr >= 4) && (c_ctrl_addr < 13); //4~12, exclude 13(
 assign o_ctrl_addr	= n_ctrl_addr; 		// 1 bram read latency
 assign o_img_addr 	= n_img_addr; 		// 1 bram read latency
 
-assign o_outimg_we = conv2d_o_valid; 		// | bn_valid | maxpool_valid
-assign o_outimg_data = conv2d_o_data;
+// assign o_outimg_addr = c_outimg_addr;
+// assign o_outimg_we = c_state == CONV2D ? conv2d_o_valid : 0; 		// | bn_valid | maxpool_valid
+// assign o_outimg_data = {16'b0, conv2d_o_data}; 		// {16'b0, conv2d_o_data};
+assign o_outimg_we = 1;
+assign o_outimg_addr = 0;
+assign o_outimg_data = {3'b0, c_width, c_height, c_kernel_sz, c_padding, c_ci};  // 0000 0000 0110 0000 0111 1100 0000 0011
 //===============================================================
 // Submodule
 conv2d_universal conv2d_inst_
@@ -79,7 +82,7 @@ conv2d_universal conv2d_inst_
 		.i_stride		(1'b1), 		// conv2d not using, 1 fixed
 		.i_max_ci		(c_ci),
 		.i_max_co		(c_co),
-		.i_data			(i_img_data),
+		.i_data			(i_img_data[15:0]),
 		.i_kernel_w		(c_kernel),
 		.o_done			(conv2d_o_done),
 		.o_data			(conv2d_o_data),
@@ -87,6 +90,8 @@ conv2d_universal conv2d_inst_
 	);
 //===============================================================
 // FF
+
+
 always@(posedge i_clk, negedge i_rst)
 	if(!i_rst) begin
 		c_kernel 		<= 0;
@@ -104,6 +109,8 @@ always@(posedge i_clk, negedge i_rst)
 		c_ctrl_addr 	<= 0;
 		c_img_addr 		<= 0;
 		c_outimg_addr 	<= 0;
+
+		// r_tmp <= 0;
 	end else begin
 		c_kernel 		<= n_kernel;
 		c_state 		<= n_state;
@@ -120,6 +127,8 @@ always@(posedge i_clk, negedge i_rst)
 		c_ctrl_addr 	<= n_ctrl_addr;
 		c_img_addr 		<= n_img_addr;
 		c_outimg_addr 	<= n_outimg_addr;
+
+		// r_tmp <= conv2d_o_valid ? r_tmp + 1 : r_tmp;
 	end
 
 
@@ -152,12 +161,12 @@ always@* begin
 				n_ctrl_addr = c_ctrl_addr + 1;
 				if(fKernel) 	n_kernel[(c_ctrl_addr-4)*DATA_WIDTH+:DATA_WIDTH] = i_ctrl_data[15:0];
 				if(&c_ctrl_addr) begin
+					n_state = CONV2D;
 					// make n_start == 0 (o_ctrl_addr == 0, o_ctrl_data == {..., 1'b0}, o_ctrl_we = 1)
 					o_ctrl_data = {23'b0, 4'b0, 1'b0, 1'b0, c_conv, 1'b0, 1'b0}; 		// {cur_layer(4), maxpool(1), Bn&ReLU(1), Conv(1), done(1), start(1)}
 					o_ctrl_we = 1;
-					n_ctrl_addr = CTRL;
+					n_ctrl_addr = 0;
 					// n_state = c_conv ? CONV2D : c_bn ? BN : c_maxpool ? MAXPOOL2D : c_state;
-					n_state = c_conv ? CONV2D : c_state;
 					conv2d_start = 1;
 				end
 			end
@@ -166,12 +175,7 @@ always@* begin
 
 		CONV2D: begin
 			n_img_addr = c_img_addr + 1;
-
-			if(conv2d_o_valid) begin
-				n_outimg_addr = c_outimg_addr + 1;
-			end
-
-
+			n_outimg_addr = o_outimg_we ? c_outimg_addr + 1 : c_outimg_addr;
 
 
 			if(conv2d_o_done) begin

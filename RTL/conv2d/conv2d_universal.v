@@ -41,10 +41,12 @@ module conv2d_universal
 /*
 	max line buffer size = 416 * 2 + 3 = 835;
 	if i_is_pad ? (416 + 2) * 2 + 3 = 839 (+2, pad sync) => 841;
+	// if 208x208 first,
+	// (208 + 2) *2 + 3 = 423 + 2 = 425
 */
 
 parameter 	DATA_WIDTH = 16;
-parameter 	MAX_BUF_SIZE = 841;
+parameter 	MAX_BUF_SIZE = 425;
 
 localparam 	IDLE 	= 0,
 			WORK 	= 1;
@@ -67,7 +69,7 @@ wire  		[15:0]  			PE_i_d0, PE_i_d1, PE_i_d2, PE_i_d3, PE_i_d4, PE_i_d5, PE_i_d6
 assign o_data 	= mux_o_d;
 assign o_valid 	= i_is_pad ? 
                  ((c_y >= 1 && c_x > 1) || c_y >= 2) && !(c_x >= 2 && c_y == i_max_height+1) && !o_done : 
-                 ((c_y == i_max_height && c_x == 0) || (c_y < i_max_height && !(c_x == 0 && c_y == 0))) && !o_done;
+                 ((c_y == i_max_height && c_x == 0) || (c_y < i_max_height)) && !o_done && !(c_x == 0 && c_y == 0);
 
 assign pad_sync = c_y >= 1 && c_x == 1;
 assign PE_i_d0 	= pad_sync ? c_line_buf[2*(i_max_width + 2)+2 	+2] : c_line_buf[2*(i_max_width + 2)+2];
