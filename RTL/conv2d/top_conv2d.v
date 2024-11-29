@@ -64,6 +64,7 @@ assign o_ctrl_addr	= n_ctrl_addr; 		// 1 bram read latency
 assign o_img_addr 	= n_img_addr; 		// 1 bram read latency
 
 assign o_outimg_we = conv2d_o_valid; 		// | bn_valid | maxpool_valid
+assign o_outimg_data = conv2d_o_data;
 //===============================================================
 // Submodule
 conv2d_universal conv2d_inst_
@@ -154,6 +155,7 @@ always@* begin
 					// make n_start == 0 (o_ctrl_addr == 0, o_ctrl_data == {..., 1'b0}, o_ctrl_we = 1)
 					o_ctrl_data = {23'b0, 4'b0, 1'b0, 1'b0, c_conv, 1'b0, 1'b0}; 		// {cur_layer(4), maxpool(1), Bn&ReLU(1), Conv(1), done(1), start(1)}
 					o_ctrl_we = 1;
+					n_ctrl_addr = CTRL;
 					// n_state = c_conv ? CONV2D : c_bn ? BN : c_maxpool ? MAXPOOL2D : c_state;
 					n_state = c_conv ? CONV2D : c_state;
 					conv2d_start = 1;
