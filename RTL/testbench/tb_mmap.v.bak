@@ -1,0 +1,59 @@
+`timescale 1ns / 1ps
+
+module mmap_tb;
+
+// Testbench에서 사용할 신호 선언
+reg tb_clk;
+reg tb_rst;
+wire [1:0] tb_o_addr0;
+reg [31:0] tb_i_data;
+wire [1:0] tb_o_addr1;
+wire tb_o_we;
+wire [31:0] tb_o_data;
+
+// DUT 인스턴스화
+mmap uut (
+    .i_clk(tb_clk),
+    .i_rst(tb_rst),
+    .o_addr0(tb_o_addr0),
+    .i_data(tb_i_data),
+    .o_addr1(tb_o_addr1),
+    .o_we(tb_o_we),
+    .o_data(tb_o_data)
+);
+
+// 클럭 생성
+initial begin
+    tb_clk = 0;
+    forever #5 tb_clk = ~tb_clk; // 주기 10ns
+end
+
+// 테스트 벡터
+initial begin
+    // 초기화
+    tb_rst = 0;
+    tb_i_data = 32'b0;
+
+    #25;
+    tb_rst = 1; // 리셋 해제
+    #30;
+    // 테스트 1: start 신호 설정
+    tb_i_data = 32'b1; // addr0 = 0, start 신호
+    #10;
+    
+    // 테스트 2: 데이터 쓰기
+    tb_i_data = 32'h12345678; // addr0 = 1, 데이터 제공
+    #10;
+    tb_i_data = 32'h0;
+    // 테스트 종료
+    #50;
+    $stop;
+end
+
+// 출력 신호 모니터링
+initial begin
+    $monitor("Time=%0t, o_addr0=%b, i_data=%h, o_addr1=%b, o_we=%b, o_data=%h", 
+             $time, tb_o_addr0, tb_i_data, tb_o_addr1, tb_o_we, tb_o_data);
+end
+
+endmodule
