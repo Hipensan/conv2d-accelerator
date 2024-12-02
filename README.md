@@ -34,6 +34,8 @@ Warning! not done project
 <h3> mio test</h3>
 if you want to test memory i/o structure, access to RTL/mmap_test, C/mmap.c<br>
 
+![img_error](./img/mmap_bd.png)
+
 ![img_error](./img/mmap_ila.png)
 
 ![img_error](./img/mmap_result.png)
