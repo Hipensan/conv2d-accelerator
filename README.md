@@ -28,3 +28,14 @@ Warning! not done project
 ![img_error](./img/model.png)
 <p> use yolov3-tiny, more simple structure to detect big objects and accelerated in conv2d</p>
 
+---
+---
+
+<h3> mio test</h3>
+if you want to test memory i/o structure, access to RTL/mmap_test, C/mmap.c<br>
+
+![img_error](./img/mmap_ila.png)
+
+![img_error](./img/mmap_result.png)
+
+
