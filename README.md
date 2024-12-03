@@ -64,3 +64,19 @@ Use <br>
 * Validation --> py/test_layer/test_layer.ipynb
 
 ---
+
+<h3> Conv with maxpool</h3>
+
+Use 
+
+* C/testheader_6x6_files/img_wrtest_with_maxpool.c
+
+* RTL/top.v
+
+* RTL/conv2d_6x6
+
+* RTL/maxpool2d
+
+* RTL/sig_splitter
+
+![img_error](./img/smol_maxpool_result.png)

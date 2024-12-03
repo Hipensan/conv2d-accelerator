@@ -151,7 +151,15 @@ int main()
     readOutImg(out_img, 0);
     for(int i =0; i<36; i++) {
     	xil_printf("Out IMG #%d : 0x%08x\r\n",i,out_img[i]);
+    	Xil_Out32(IMG_MEM + 4*i, out_img[i]);
     }
+//    xil_printf("Conv done image to img memory\r\n");
+//    for(int i =0; i < 36; i++) {
+//        	rdata = Xil_In32(IMG_MEM + 4*i);
+//        	xil_printf("CONV IMG #%d : 0x%08x\r\n",i,rdata);
+//        }
+
+
     xil_printf("maxpool start\r\n");
     writeCTRL(1,0,0,0,1,0);
     while(1) {
