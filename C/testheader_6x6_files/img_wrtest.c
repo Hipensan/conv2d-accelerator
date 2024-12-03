@@ -9,6 +9,8 @@
 #include "xparameters.h"
 #include "xil_io.h"
 #include "time.h"
+#include "xscutimer.h"
+#define TIMER_DEVICE_ID XPAR_SCUTIMER_DEVICE_ID
 
 #define CTRL_MEM 	XPAR_AXI_BRAM_CTRL_0_S_AXI_BASEADDR
 #define IMG_MEM 	XPAR_AXI_BRAM_CTRL_1_S_AXI_BASEADDR
@@ -109,6 +111,14 @@ int main()
 {
     init_platform();
     u32 rdata;
+    // timer
+    XScuTimer timer;
+    XScuTimer_Config *config = XScuTimer_LookupConfig(TIMER_DEVICE_ID);
+    XScuTimer_CfgInitialize(&timer, config, config->BaseAddr);
+    XScuTimer_LoadTimer(&timer, 0xFFFFFFFF);
+    XScuTimer_Start(&timer);
+    //
+    u32 start_time = XScuTimer_GetCounterValue(&timer);
 
     writeImg(&test_image, 0);
     for(int i =0; i < 36; i++) {
@@ -143,8 +153,12 @@ int main()
     	xil_printf("Out IMG #%d : 0x%08x\r\n",i,out_img[i]);
     }
 
-    rdata = Xil_In32(OUTIMG_MEM);
-    xil_printf("first : 0x%08x\r\n", rdata);
+    u32 end_time = XScuTimer_GetCounterValue(&timer);
+    u32 elapsed = start_time - end_time; // 클럭 주기 차이
+    uint64_t elapsed_ns = ((uint64_t)elapsed * 1000000000) / 666666666;
+    uint32_t elapsed_sec = elapsed_ns / 1000000000;
+    uint32_t remaining_ns = elapsed_ns % 1000000000;
+    xil_printf("elapsed cycle / time(s) : %u / %u.%09u (s)  ", elapsed, elapsed_sec, remaining_ns);
 
     cleanup_platform();
     return 0;
