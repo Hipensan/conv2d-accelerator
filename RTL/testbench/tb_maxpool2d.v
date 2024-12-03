@@ -13,6 +13,7 @@ module tb_maxpool2d;
     reg i_rst;
     reg i_start;
     reg [DATA_WIDTH-1:0] i_data;
+    reg [8:0] i_max_width, i_max_height;
 
     // Outputs
     wire [DATA_WIDTH-1:0] o_data;
@@ -21,15 +22,15 @@ module tb_maxpool2d;
     // Instantiate the Unit Under Test (UUT)
     maxpool2d #
     (
-        .DATA_WIDTH(DATA_WIDTH),
-        .IMG_WIDTH(IMG_WIDTH),
-        .IMG_HEIGHT(IMG_HEIGHT)
+        .DATA_WIDTH(DATA_WIDTH)
     )
     uut
     (
         .i_clk(i_clk),
         .i_rst(i_rst),
         .i_start(i_start),
+        .i_max_width (i_max_width),
+        .i_max_height(i_max_height),
         .i_data(i_data),
         .o_data(o_data),
         .o_done (o_done),
@@ -52,6 +53,8 @@ module tb_maxpool2d;
         i_rst = 0;
         i_start = 0;
         i_data = 0;
+        i_max_width = 6;
+        i_max_height = 6;
 
         // Reset sequence
         #(CLK_PERIOD);
@@ -60,7 +63,7 @@ module tb_maxpool2d;
 
         // Load image data
         // Here, we generate a test pattern; you can replace this with actual image data if needed
-        for (i = 0; i < IMG_WIDTH*IMG_HEIGHT; i = i + 1) begin
+        for (i = 0; i < i_max_width*i_max_height; i = i + 1) begin
             image_data[i] = {i, 8'h0};
         end
 
@@ -73,7 +76,7 @@ module tb_maxpool2d;
         i_start = 0;
         
         // Feed input data
-        for (i = 0; i < IMG_WIDTH*IMG_HEIGHT; i = i + 1) begin
+        for (i = 0; i < i_max_width*i_max_height; i = i + 1) begin
             i_data = image_data[i];
             #(CLK_PERIOD);
             
