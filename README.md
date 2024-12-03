@@ -56,17 +56,10 @@ Use <br>
 
 ![img_error](./img/smol_bd.png)
 
-* CTRL
+| CTRL | IMG  | RESULT |
+|------|------|--------|
+| ![img_error](./img/smol_ctrl.png) | ![img_error](./img/smol_img.png) | ![img_error](./img/smol_result.png) |
 
-![img_error](./img/smol_ctrl.png)
-
-* IMG
-
-![img_error](./img/smol_img.png)
-
-* RESULT
-
-![img_error](./img/smol_result.png)
 
 * Validation --> py/test_layer/test_layer.ipynb
 
