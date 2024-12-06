@@ -22,7 +22,8 @@ localparam  IDLE        = 0,
             BUF_FILL    = 1,
             WORK        = 2;
 
-localparam  LINE_BUF_SIZE   = 416;        // 416 * 2(w. cam, 208 * 2)
+//localparam  LINE_BUF_SIZE   = 416;        // 416 * 2(w. cam, 208 * 2) // for z7010, sup 52 (52*2=104)
+localparam LINE_BUF_SIZE = 104;
 localparam  HALF_BUF_SIZE   = LINE_BUF_SIZE / 2;
 
 //========================================

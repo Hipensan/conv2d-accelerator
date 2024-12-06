@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-s16 original_image[6][6] = {
+int16_t original_image[6][6] = {
     {
 0x0100,
 0x0100,

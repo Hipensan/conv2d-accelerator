@@ -79,4 +79,8 @@ Use
 
 * RTL/sig_splitter
 
+<h4>If the slack is negative</h4>
+
+* Make your PL clock to 25Mhz or lower
+
 ![img_error](./img/smol_maxpool_result.png)

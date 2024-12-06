@@ -43,11 +43,13 @@ module conv2d_universal
 	if i_is_pad ? (416 + 2) * 2 + 3 = 839 (+2, pad sync) => 841;
 	// if 208x208 first,
 	// (208 + 2) *2 + 3 = 423 + 2 = 425
+	for z7010, 52x52, 26x26, 13x13 support
+	(52 + 2) * 2 + 3 + 2 = 108 + 5 = 113
 */
 
 parameter 	DATA_WIDTH = 16;
-parameter 	MAX_BUF_SIZE = 425;
-
+//parameter 	MAX_BUF_SIZE = 425;
+parameter MAX_BUF_SIZE = 113;
 localparam 	IDLE 	= 0,
 			WORK 	= 1;
 
