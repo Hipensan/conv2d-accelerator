@@ -1,12 +1,3 @@
-# yolov3-tiny-accelerator
-
-Warning! not done project
-
-![img_error](./img/under_construction.png)
-
-
-
-[testing] accelerate conv, maxpool in yolov3-tiny w. Verilog, vivado <br>
 hw / sw co-design
 
 <h3>Quickstart</h3>
@@ -22,12 +13,6 @@ hw / sw co-design
 * ZYNQ Z7020 board or greater (i'm using edge fpga z7020 board)
 * OV7670 camera
 
-
-
-<h3>Model</h3>
-
-![img_error](./img/model.png)
-<p> use yolov3-tiny, more simple structure to detect big objects and accelerated in conv2d</p>
 
 ---
 ---
