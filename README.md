@@ -1,11 +1,4 @@
-hw / sw co-design
-
-<h3>Quickstart</h3>
-
-1. run all code in py/read_weights.ipynb
-2. generate JSON, npy, txt, and header file
-
-
+<h1> hw / sw co-design </h1>
 <h3> Requirements </h3>
 
 * Vivado 2018.3
